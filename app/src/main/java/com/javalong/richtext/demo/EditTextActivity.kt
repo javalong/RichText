@@ -29,9 +29,9 @@ class EditTextActivity : AppCompatActivity() {
     //链式结构
     private fun initContentTop() {
         RichText.Builder(this)
-                .backColor(1, 4, Color.RED)
-                .foreColor(5, 9, Color.BLUE)
-                .fontSize(10, 15, 20)
+                .backColor(1, 4, Color.RED,SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
+                .foreColor(5, 9, Color.BLUE,SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
+                .fontSize(10, 15, 20,SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
                 .image(2, 3, resources.getDrawable(R.mipmap.ic_launcher))
                 .addTextSpanOperation(TextSpanOperation(3, 4, AbsoluteSizeSpan(20)))
                 .text(TEXT)

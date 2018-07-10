@@ -13,10 +13,9 @@ import java.util.*
 
 class RichText {
     class Builder(private val context: Context) {
-        //文本
         private var text = ""
         private var operationList = ArrayList<TextSpanOperation>()
-
+        //文本
         fun text(text: String): Builder {
             this.text = text
             return this
