@@ -10,13 +10,18 @@
 //链式结构
     private fun initContentTop() {
         RichText.Builder(this)
-                .backColor(1, 4, Color.RED)
-                .foreColor(5, 9, Color.BLUE)
-                .fontSize(10, 15, 20)
-                .image(2, 3, resources.getDrawable(R.mipmap.ic_launcher))
-                .addTextSpanOperation(TextSpanOperation(3, 4, AbsoluteSizeSpan(20)))
-                .text(TEXT)
-                .build(tvContentTop)
+                        .backColor(1, 4, Color.RED)
+                        .foreColor(5, 9, Color.BLUE)
+                        .fontSize(10, 15, 20)
+                        .image(2, 3, resources.getDrawable(R.mipmap.ic_launcher))
+                        .addTextSpanOperation(TextSpanOperation(3, 4, AbsoluteSizeSpan(20)))
+                        .click(6, 16, View.OnClickListener {
+                            Toast.makeText(this@TextViewActivity, TEXT, Toast.LENGTH_LONG).show()
+                        })
+                        .underline(15, 20)
+                        .strikethrough(21, 23)
+                        .text(TEXT)
+                        .build(tvContentTop)
     }
 
     //常规写法
@@ -29,11 +34,26 @@
         var image = ImageSpan(d)
         var fontSize2 = AbsoluteSizeSpan(20)
         var spanBuilder = SpannableStringBuilder(TEXT)
+        var clickSpan = object : ClickableSpan() {
+            override fun onClick(widget: View?) {
+                Toast.makeText(this@TextViewActivity, TEXT, Toast.LENGTH_LONG).show()
+            }
+
+            override fun updateDrawState(ds: TextPaint?) {
+                //去掉一些样式，都由自己来定义
+            }
+        }
+        var underlineSpan = UnderlineSpan()
+        var strikethroughSpan = StrikethroughSpan()
         spanBuilder.setSpan(backColor, 1, 4, SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
         spanBuilder.setSpan(foreColor, 5, 9, SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
         spanBuilder.setSpan(fontSize, 10, 15, SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
         spanBuilder.setSpan(image, 2, 3, SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
         spanBuilder.setSpan(fontSize2, 3, 4, SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spanBuilder.setSpan(clickSpan, 6, 16, SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spanBuilder.setSpan(underlineSpan, 15, 20, SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
+        spanBuilder.setSpan(strikethroughSpan, 21, 23, SpannableStringBuilder.SPAN_EXCLUSIVE_EXCLUSIVE)
+        tvContentBottom.movementMethod = MyLinkMovementMethod.getInstance()
         tvContentBottom.text = spanBuilder
     }
 ```
@@ -54,7 +74,7 @@ allprojects {
 Step 2. Add the dependency
 ```gradle
 	dependencies {
-	        implementation 'com.github.javalong:RichText:1.0.0'
+	        implementation 'com.github.javalong:RichText:1.1.0'
 	}
 ```
 
@@ -93,18 +113,54 @@ Step 3. Multiple text span operation
             operationList.add(TextSpanOperation(startIndex, endIndex, span))
             return this
         }
+        
+        //设置点击事件
+        fun click(startIndex: Int, endIndex: Int, listener: View.OnClickListener): Builder {
+            var span = object : ClickableSpan() {
+                override fun onClick(widget: View?) {
+                    listener.onClick(widget)
+                }
+
+                override fun updateDrawState(ds: TextPaint?) {
+                    //去掉一些样式，都由自己来定义
+
+                }
+            }
+            operationList.add(TextSpanOperation(startIndex, endIndex, span))
+            return this
+        }
+        
+        //添加下划线
+        fun underline(startIndex: Int, endIndex: Int): Builder {
+            var span = UnderlineSpan()
+            operationList.add(TextSpanOperation(startIndex, endIndex, span))
+            return this
+        }
+        
+        //添加中划线
+        fun strikethrough(startIndex: Int, endIndex: Int): Builder {
+            var span = StrikethroughSpan()
+            operationList.add(TextSpanOperation(startIndex, endIndex, span))
+            return this
+        }
+
 ```
 
 Step 4. Use in code
 ```java
- RichText.Builder(this)             
-                .backColor(1, 4, Color.RED)
-                .foreColor(5, 9, Color.BLUE)
-                .fontSize(10, 15, 20)
-                .image(2, 3, resources.getDrawable(R.mipmap.ic_launcher))
-                .addTextSpanOperation(TextSpanOperation(3, 4, AbsoluteSizeSpan(20)))
-                .text(TEXT)
-                .build(tvContentTop)
+ RichText.Builder(this)
+                 .backColor(1, 4, Color.RED)
+                 .foreColor(5, 9, Color.BLUE)
+                 .fontSize(10, 15, 20)
+                 .image(2, 3, resources.getDrawable(R.mipmap.ic_launcher))
+                 .addTextSpanOperation(TextSpanOperation(3, 4, AbsoluteSizeSpan(20)))
+                 .click(6, 16, View.OnClickListener {
+                     Toast.makeText(this@TextViewActivity, TEXT, Toast.LENGTH_LONG).show()
+                 })
+                 .underline(15, 20)
+                 .strikethrough(21, 23)
+                 .text(TEXT)
+                 .build(tvContentTop)
 ```
 重点可以关注下`addTextSpanOperation`方法，因为TextSpan有很多，这里就把常见的几个抽取出来。
 
